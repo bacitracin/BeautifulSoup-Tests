@@ -65,7 +65,8 @@ def get_cruise_review_links(ship_page):
     return individual_review_list
 
 
-# Downloading the relevant bits from the individual review page, stores them in a dict
+# Downloading the relevant bits from the individual review page, stores them in a dict.
+# This function works fine, it's the pull cruise reviews one after this that is messed up
 def cruise_review_metrics(individual_review_url):
     html = urlopen(individual_review_url).read()
     review_soup = BeautifulSoup(html, 'lxml')
@@ -147,7 +148,7 @@ def pull_cruise_reviews(individual_review_list):
 reviews_urls = get_cruise_review_links('http://www.cruisecritic.com/memberreviews/getreviews.cfm?action=ship&ShipID=641')
         
 # 2. Iterate across the member reviews & pull each individual review as a dictionary
-pull_cruise_reviews(reviews_urls)
+list_of_reviews = pull_cruise_reviews(reviews_urls)
 
 # 3. Write the list of dictionaries to a CSV. WOOT.
 with open('cruise_reviews.csv', 'a') as output:
