@@ -71,6 +71,8 @@ def cruise_review_metrics(individual_review_url):
     html = urlopen(individual_review_url).read()
     review_soup = BeautifulSoup(html, 'lxml')
     main_review_soup = review_soup.find('div', id = 'main-review')
+
+    # Review Summary Stats
     title = main_review_soup.find("h2").string
     username = review_soup.find('div', id = "user-user-name").string.strip()
     overall_rating = main_review_soup.find('img')['src']
@@ -78,33 +80,45 @@ def cruise_review_metrics(individual_review_url):
     sail_date, destination, embarkation = review_details[0], review_details[1], review_details[2]
     sail_date, destination, embarkation = sail_date.contents[2], destination.contents[2], embarkation.contents[2]
     sail_date, destination, embarkation = sail_date.strip(), destination.strip(), embarkation.strip()
+   
     body_text_soup= main_review_soup.find("p")
     body_text= body_text_soup.contents
     body_text = body_text[1] #review_date = body_text_soup.find("i")
+    
+    #review_date = body_text_soup.find("i")    
+    
+    # Cabin specific ratings
     cabin_review_soup = review_soup.find('div', class_='subreview')    
     cabin_name = cabin_review_soup.find("h2").string      
     cabin_rating = cabin_review_soup.find('img')['src'] 
     cabin_review = cabin_review_soup.find("p")   
+    
     table_soup = review_soup.findAll('table')  
     table_one = list(table_soup[0]) #left side of table
     table_two = list(table_soup[1]) #right side of table  
+    
     dining_rating = list(table_one[3])[3]       
     embarkation_rating = list(table_one[5])[3] 
     enrichment_rating = list(table_one[7])[3]
     entertainment_rating = list(table_one[9])[3]  
     family_rating = list(table_one[11])[3]  
+    
     fitness_rating = list(table_two[1])[3]  
     public_room_rating = list(table_two[3])[3]    
     rates_rating = list(table_two[5])[3]   
     service_rating = list(table_two[7])[3] 
     shore_excursions_rating = list(table_two[9])[3]  
     value_rating = list(table_two[11])[3]
+    
+    # User Stats    
     user_number_of_reviews = review_soup.find('div', id = "user-total-reviews").contents
     user_number_of_reviews = user_number_of_reviews[1]
     user_total_posts = review_soup.find('div', id = 'user-total-posts')
     user_total_posts = user_total_posts.string
     user_join_year = review_soup.find('div', id = 'user-join-year')
     user_join_year = user_join_year.string
+    
+    # Throw the stats into a dictionary for the review      
     review_info = {"ship name" : individual_review_url, 
                    "title" : str(title),
                    "username" : str(username),
@@ -138,8 +152,11 @@ def cruise_review_metrics(individual_review_url):
 def pull_cruise_reviews(individual_review_list):
     cruise_review_metrics_list = []    
     for url in individual_review_list:
-        user_cruise_review = cruise_review_metrics(url)
-        cruise_review_metrics_list.append(user_cruise_review)
+        try:        
+            user_cruise_review = cruise_review_metrics(url)
+            cruise_review_metrics_list.append(user_cruise_review)
+        except:
+            cruise_review_metrics_list.append("Exception")
     return cruise_review_metrics_list
 
     
